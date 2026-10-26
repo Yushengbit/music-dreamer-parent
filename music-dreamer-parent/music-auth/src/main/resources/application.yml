@@ -1,0 +1,39 @@
+server:
+  port: 8082
+
+spring:
+  # MySQL
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/music_dreamer?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  # Redis
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password:
+
+# ========== JWT 配置 ==========
+music:
+  jwt:
+    # 至少 32 字节（256 位），生产环境请放到 Nacos 配置中心
+    secret: music-dreamer-jwt-secret-key-must-be-at-least-32bytes-long-2026
+    # token 有效期（秒），7200 = 2 小时
+    expiration: 7200
+    # 登出黑名单 key 前缀（必须与网关 music.jwt.blacklist-prefix 一致）
+    # 注意：值以冒号结尾，必须用引号包起来，否则 YAML 会报 "mapping values are not allowed here"
+    blacklist-prefix: "music:black:jti:"
+
+# ========== MyBatis-Plus ==========
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.musicdreamer.auth.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+

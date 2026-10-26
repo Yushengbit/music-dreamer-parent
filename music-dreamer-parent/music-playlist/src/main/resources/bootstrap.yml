@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: music-playlist
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        # 注册失败不阻断启动：Nacos 未就绪时服务照常启动，Nacos 起来后会自动补注册
+        fail-fast: false
+        # 强制注册 127.0.0.1，避免被识别为局域网网卡 IP 导致网关路由失败
+        ip: 127.0.0.1
+        namespace:
+        group: DEFAULT_GROUP
+      config:
+        server-addr: 127.0.0.1:8848
+        namespace:
+        group: DEFAULT_GROUP
+        file-extension: yaml

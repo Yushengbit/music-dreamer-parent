@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.qst</groupId>
+    <artifactId>music-dreamer-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>music-common</module>
+        <module>music-gateway</module>
+        <module>music-auth</module>
+        <module>music-user</module>
+        <module>music-file</module>
+        <module>music-singer</module>
+        <module>music-song</module>
+        <module>music-playlist</module>
+        <module>music-notice</module>
+    </modules>
+
+    <properties>
+        <!-- 只能用 17/21：Spring Boot 3.2.4(Spring 6.1.5) 的 ASM 解析不了 Java 22+ 的 class 文件。
+             用 release 而不是 source/target，顺带禁止误用 JDK 26 才有的 API -->
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.boot.version>3.2.4</spring.boot.version>
+        <spring.cloud.alibaba.version>2023.0.1.0</spring.cloud.alibaba.version>
+        <spring.cloud.version>2023.0.1</spring.cloud.version>
+        <mybatis.plus.version>3.5.5</mybatis.plus.version>
+        <jjwt.version>0.12.6</jjwt.version>
+        <lombok.version>1.18.48</lombok.version>
+        <spring.security.crypto.version>6.2.4</spring.security.crypto.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring.cloud.alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis.plus.version}</version>
+            </dependency>
+
+            <!-- Lombok 需显式锁定版本：spring-boot-dependencies 是以 BOM 方式 import 的，
+                 里面的 lombok.version 属性不会被本 pom 的 ${lombok.version} 覆盖，
+                 实际会用到 1.18.30，在 JDK 26 的 javac 下会抛
+                 ExceptionInInitializerError: com.sun.tools.javac.code.TypeTag :: UNKNOWN -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <!-- 内部公共模块：统一给子模块托底groupId/version，子模块引用时不用再写 version -->
+            <dependency>
+                <groupId>com.qst</groupId>
+                <artifactId>music-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Maven 3.3.9 自带的 maven-compiler-plugin 3.1 太老，不支持 annotationProcessorPaths；
+                     统一升级到子模块可继承的版本 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <!-- JDK 23 起 javac 不再自动从 classpath 发现注解处理器，
+                             必须显式给出 -processorpath，否则 @Data 之类不生成 getter/setter -->
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+                <!-- Spring Boot 打包插件：版本在此统一锁定，
+                     子模块只需写 <plugin> 引用即可，不用再各自写 <version>。
+                     升级 Spring Boot 时只改这里一处。
+                     注意：music-common 是普通依赖模块，不引入此插件。 -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

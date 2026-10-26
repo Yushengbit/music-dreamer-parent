@@ -1,0 +1,52 @@
+server:
+  port: 8087
+
+spring:
+  # 文件上传大小限制（必须 >= 代码里各业务类型的最大值，否则大文件会被 Tomcat 提前拦掉）
+  servlet:
+    multipart:
+      enabled: true
+      # 单个文件最大 100MB（歌曲最大 50MB、普通文件最大 100MB）
+      max-file-size: 100MB
+      # 整个请求最大 100MB
+      max-request-size: 100MB
+  # MySQL连接
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/music_dreamer?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+  # Redis
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password:
+
+# ========== 本地文件存储配置 ==========
+music:
+  file:
+    # 文件保存的根目录。
+    # ./uploads 表示在服务「启动目录」下创建 uploads 文件夹；
+    # 也可以写成 Windows 绝对路径，例如 D:/music-dreamer/upload（注意用 / 或 \\）
+    storage-path: ./uploads
+    # 返回给前端的 URL 前缀（不含域名端口），与网关的 /file/** 路由对应
+    access-prefix: /file
+
+# ========== MyBatis-Plus 完整配置 ==========
+mybatis-plus:
+  # mapper xml文件位置
+  mapper-locations: classpath:mapper/**/*.xml
+  # 实体类别名包
+  type-aliases-package: com.musicdreamer.file.entity
+  configuration:
+    # 下划线转驼峰
+    map-underscore-to-camel-case: true
+    # 打印SQL日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 主键策略
+      id-type: auto
+
+

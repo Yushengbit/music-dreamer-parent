@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: music-gateway
+  cloud:
+    nacos:
+      discovery:
+        enabled: true  # 👈 强制开启
+        server-addr: 127.0.0.1:8848
+        # 注册失败不阻断启动：Nacos 未就绪时服务照常启动，Nacos 起来后会自动补注册
+        fail-fast: false
+        ip: 127.0.0.1
+        group: DEFAULT_GROUP
+      config:
+        enabled: true  # 👈 强制开启
+        server-addr: 127.0.0.1:8848
+        group: DEFAULT_GROUP
+        file-extension: yaml
+    service-registry:
+      auto-registration:
+        enabled: true  # 👈 强制开启

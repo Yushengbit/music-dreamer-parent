@@ -1,0 +1,59 @@
+server:
+  port: 8080
+
+spring:
+  # Redis：用于校验 token 黑名单（登出后的 token）
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password:
+  cloud:
+    gateway:
+      routes:
+        - id: music-auth
+          uri: lb://music-auth #lb负载均衡器
+          predicates:
+            - Path=/auth/**
+        - id: music-user
+          uri: lb://music-user
+          predicates:
+            - Path=/user/**
+        - id: music-singer
+          uri: lb://music-singer
+          predicates:
+            - Path=/singer/**
+        - id: music-song
+          uri: lb://music-song
+          predicates:
+            - Path=/song/**
+        - id: music-playlist
+          uri: lb://music-playlist
+          predicates:
+            - Path=/playlist/**
+        - id: music-notice
+          uri: lb://music-notice
+          predicates:
+            - Path=/notice/**
+        - id: music-file
+          uri: lb://music-file
+          predicates:
+            - Path=/file/**
+
+# ========== 网关 JWT 鉴权配置 ==========
+music:
+  # 必须与 music-auth 的密钥一致，否则 token 解析失败
+  jwt:
+    secret: music-dreamer-jwt-secret-key-must-be-at-least-32bytes-long-2026
+    expiration: 7200
+    # 登出黑名单 key 前缀（必须与 music-auth 一致）
+    # 注意：值以冒号结尾，必须用引号包起来，否则 YAML 会报 "mapping values are not allowed here"
+    blacklist-prefix: "music:black:jti:"
+  gateway:
+    auth:
+      # 不需要登录就能访问的路径（白名单）
+      # 注意：/auth/logout 不能放进来，它需要读取 token 才能知道登出谁
+      white-list:
+        - /auth/login
+        - /auth/register
+        # 将来加：/auth/captcha, /auth/refresh 等
